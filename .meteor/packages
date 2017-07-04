@@ -14,7 +14,8 @@ accounts-password
 
 ############ Your Packages ############
 
-example-movies
+ example-calendar
+# example-movies
 # example-instagram
 # example-forum
 # example-customization
