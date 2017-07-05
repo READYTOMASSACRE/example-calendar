@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import DayNames from './DayNames'
 
-
 class CalendarBody extends Component {
     get listItems() {
         let _items = this.props.items.map((item,) =>

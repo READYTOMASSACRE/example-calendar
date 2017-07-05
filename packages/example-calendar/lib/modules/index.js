@@ -4,5 +4,4 @@ import './calendar/collection.js'
 
 replaceComponent('Layout', Layout);
 
-console.log('wow its was edited')
 import './routes.js'

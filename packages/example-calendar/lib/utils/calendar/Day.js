@@ -155,7 +155,7 @@ export default class Day {
     /**
      * Геттер
      *
-     * @var currentDay - Текущий месяц
+     * @var currentMonth - Текущий месяц
      *
      * @return {Integer}
      */
@@ -166,7 +166,7 @@ export default class Day {
     /**
      * Геттер
      *
-     * @var currentDay - Текущий день
+     * @var currentYear - Текущий день
      *
      * @return {Integer}
      */
@@ -191,6 +191,8 @@ export default class Day {
      * @return {String}
      */
     get key() {
-        return this.currentYear.toString() + this.currentMonth.toString()
+        return this.currentYear.toString()
+            + this.currentMonth.toString()
+            + this.currentDay.toString()
     }
 }

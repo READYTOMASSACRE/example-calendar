@@ -1,98 +1,139 @@
-import React, { Component } from 'react';
-import Calendar, { DrawLine } from '../../utils/calendar'
+import React, { Component } from 'react'
+import Calendar, { Month, Week, Day, DrawLine } from '../../utils/calendar'
+import { Components, withList, withCurrentUser, Loading, getFragment } from 'meteor/vulcan:core'
+import CalendarCollection from '../../modules/calendar/collection'
 import CalendarHeader from './CalendarHeader'
-import CalendarBody from './CalendarBody'
+import CalendarDay from './CalendarDay'
+import CalendarMonth from './CalendarMonth'
 import CalendarButtons from './CalendarButtons'
 import CalendarModal from './CalendarModal'
-import { Components, withList, withCurrentUser, Loading, getFragment } from 'meteor/vulcan:core';
-import CalendarCollection from '../../modules/calendar/collection'
 
+/**
+ * @inheritdoc
+ */
 class CalendarComponent extends Component {
+    /**
+     * @inheritdoc
+     */
     constructor(props) {
         super(props)
         this.handleClick = this.handleClick.bind(this)
         this.selectItem = this.selectItem.bind(this)
-        this.showDrawLineText = this.showDrawLineText.bind(this)
-        this.deleteDrawLine = this.deleteDrawLine.bind(this)
 
-        let calendar = new Calendar(props.date || new Date())
-            , line = props.results.slice(0, 1).pop()
+        this.drawLineShow = this.drawLineShow.bind(this)
+        this.drawLineAdd = this.drawLineAdd.bind(this)
+        this.drawLineUpdate = this.drawLineUpdate.bind(this)
+        this.drawLineDelete = this.drawLineDelete.bind(this)
+
+        let lines = []
+        if (props.results && props.results instanceof Array) {
+            props.results.map(item => {
+                lines.push(new DrawLine(item))
+            })
+        }
+
         this.state = {
-            calendar: calendar
-            , line: props.line || new DrawLine({startedAt: line.startedAt, finishedAt: line.finishedAt, description: line.description})
+            calendar: new Calendar(props.date || new Date())
+            , lines: lines
             , toggleButtons: false
             , toggleModal: false
         }
     }
 
+    /**
+     * обрабатывает клик смены дня/месяца
+     */
     handleClick(e, direction) {
         if (direction === 'left') {
             this.state.calendar.prev()
         } else {
             this.state.calendar.next()
         }
-        this.setActive()
     }
 
-    componentDidMount() {
-        this.setActive()
+    /**
+     * обрабатывает клик смены отображения дня/месяца
+     *
+     * @param {Event} e
+     * @param {String} type
+     */
+    handleChangeType(e, type) {
+        this.state.calendar.setCurrent(type)
     }
 
+    /**
+     * обрабатывает клик
+     *
+     * @param {Event} e
+     * @param {Day} selectedItem
+     */
     selectItem(e, selectedItem) {
-        let line = this.state.line
-            , toggleButtons = false
-        if (line.isEmptyFor(selectedItem)) {
-            line.change(selectedItem)
-        } else {
-            toggleButtons = !toggleButtons
-        }
-        this.setState((prevState, props) => {
-            return {
-                toggleButtons: toggleButtons
-            }
-        })
-        this.setActive(line)
-    }
+        let line = this.findLine(selectedItem.get())
+            , drawLine = this.state.currentDrawLine
 
-    setActive(line) {
-        line = line || this.state.line
-        this.state.calendar.current.get().map(item => {
-            item.active = false
-            return item
-        })
-        switch(line.status) {
-            case 'begin':
-                this.state.calendar.current.get().map(item => {
-                    if (line.startedAt === item) {
-                        item.active = !item.active
-                    }
-                    return item
-                })
-                break
-            case 'finish':
-                this.state.calendar.current.get().map(item => {
-                    if (
-                        item.get() >= line.startedAt.get()
-                        && line.finishedAt.get() >= item.get()
-                    ) {
-                        item.active = !item.active
-                    }
-                    return item
-                })
-                break
-            default:
-                break
+        if (!line) {
+
         }
 
         this.setState((prevState, props) => {
             return {
-                calendar: prevState.calendar
-                    , line: line
+                lines: lines
+                , toggleButtons: toggleButtons
             }
         })
     }
 
-    showDrawLineText(e) {
+    /**
+     * Находит бронь по дате
+     *
+     * @param {Date} date
+     *
+     * @return {DrawLine}
+     *
+     * @throws {Error}
+     */
+    findLine(date) {
+        if (!(date instanceof Date)) {
+            throw new Error('Param must be instance of Date')
+        }
+
+        return this.state.lines.find(item => item.startedAt.get() === date
+            || (
+                item.finishedAt
+                && date >= item.startedAt.get()
+                && item.finishedAt.get() <= date
+            )
+        )
+    }
+
+    /**
+     * добавляет новую бронь
+     */
+    drawLineAdd(e) {
+        console.log('delete')
+        return null
+    }
+
+    /**
+     * изменяет бронь
+     */
+    drawLineUpdate(e) {
+        console.log('delete')
+        return null
+    }
+
+    /**
+     * удаляет бронь
+     */
+    drawLineDelete(e) {
+        console.log('delete')
+        return null
+    }
+
+    /**
+     * показывает бронь
+     */
+    drawLineShow(e) {
         this.setState((prevState, props) => {
             return {
                 toggleModal: !prevState.toggleModal
@@ -100,21 +141,10 @@ class CalendarComponent extends Component {
         })
     }
 
-    deleteDrawLine() {
-        console.log('delete')
-        return null
-    }
-
+    /**
+     * @inheritdoc
+     */
     render() {
-        const items = this.state.calendar.current.get()
-        let buttons = null
-            , modal = null
-        if (this.state.toggleButtons) {
-            buttons = <CalendarButtons showClick={this.showDrawLineText} deleteClick={this.deleteDrawLine} />
-        }
-        if (this.state.toggleModal) {
-            modal = <CalendarModal text={this.state.line.text} />
-        }
         return (
             <div className="calendar">
                 <div style={{padding: '20px 0', marginBottom: '20px', borderBottom: '1px solid #ccc'}}>
@@ -122,13 +152,45 @@ class CalendarComponent extends Component {
                   <Components.AccountsLoginForm />
 
                 </div>
-                <table>
-                    <CalendarHeader toggle={this.handleClick}/>
-                    <CalendarBody select={this.selectItem} items={items} />
+                <table className="table table-hover">
+                    {/* Render Header */}
+                    <CalendarHeader
+                        toggle={this.handleClick}
+                        calendarItem={this.state.calendar.current}
+                    />
+                    {
+                        /* Render Body */
+                        this.state.calendar.current instanceof Day
+                            ? <CalendarDay
+                                select={this.selectItem}
+                                drawLines={this.state.lines}
+                                calendarItem={this.state.calendar.current}
+                            />
+                            : <CalendarMonth
+                                select={this.selectItem}
+                                drawLines={this.state.lines}
+                                calendarItem={this.state.calendar.current}
+                            />
+                    }
                 </table>
-                {buttons}
-                {modal}
                 {
+                    /* Render buttons */
+                    this.state.toggleButtons
+                        ? <CalendarButtons
+                            addClick={this.drawLineAdd}
+                            showClick={this.drawLineShow}
+                            deleteClick={this.drawLineDelete}
+                        />
+                        : null
+                }
+                {
+                    /* Render modal */
+                    this.state.toggleModal
+                        ? <CalendarModal text={this.state.line.text} />
+                        : null
+                }
+                {
+                    /* Render form Add Draw Line */
                     CalendarCollection.options.mutations.new.check(this.props.currentUser)
                         ? <Components.SmartForm
                           collection={CalendarCollection}

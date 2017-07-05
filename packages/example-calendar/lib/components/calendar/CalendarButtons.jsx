@@ -15,9 +15,16 @@ export default class CalendarButtons extends Component {
         return this.props.deleteClick(e)
     }
 
+    handleAddClick(e) {
+        return this.props.addClick(e)
+    }
+
     render() {
         return (
             <div className="buttons">
+                <button onClick={this.handleAddClick}>
+                    <legend>Add</legend>
+                </button>
                 <button onClick={this.handleShowClick}>
                     <legend>Show</legend>
                 </button>

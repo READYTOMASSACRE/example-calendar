@@ -17,10 +17,24 @@ export default class Calendar {
             , month = new Month(d)
 
         this.type = opts.type
-        this.day = new Map([[day.currentYear.toString() + day.currentMonth.toString(), day]])
-        this.week = new Map([[week.currentYear.toString() + week.currentMonth.toString(), week]])
-        this.month = new Map([[month.currentYear.toString() + month.currentMonth.toString(), month]])
-
+        this.day = new Map([
+            [
+                day.currentYear.toString() + day.currentMonth.toString(),
+                day
+            ]
+        ])
+        this.week = new Map([
+            [
+                week.currentYear.toString() + week.currentMonth.toString(),
+                week
+            ]
+        ])
+        this.month = new Map([
+            [
+                month.currentYear.toString() + month.currentMonth.toString(),
+                month
+            ]
+        ])
         switch(this.type) {
             default:
                 this.current = month
@@ -68,6 +82,11 @@ export default class Calendar {
         return this
     }
 
+    /**
+     * Возвращает коллекцию
+     *
+     * @return {Map}
+     */
     get() {
         let data = null
         switch (this.type) {
@@ -84,6 +103,33 @@ export default class Calendar {
 
         return data
     }
+
+    /**
+     * Меняет состояние календаря
+     *
+     * @param {String} type
+     *
+     * @return {Calendar}
+     */
+    setCurrent(type) {
+        if (this.type === type) return this
+        if (['day', 'week', 'month'].indefOx(type) === -1) {
+            throw new Error('Invalid type')
+        }
+
+        this.type = type
+        if (type === 'day') {
+            this.change(this.current.copy().get().pop())
+        } else {
+            let day = this.current.copy()
+            if (!(day instanceof Day)) {
+                day = day.pop()
+            }
+            this.change(type === 'week' && new Week(day) || new Month(day))
+        }
+
+        return this
+    }
 }
 
-export { DrawLine }
+export { DrawLine, Month, Week, Day }
