@@ -1,9 +1,24 @@
 .active {
-    background: #000;
-    color: #fff;
-    border-bottom: 3px solid red;
+    background: #000 !important;
+    color: #fff !important;
+    border-bottom: 3px solid red !important;
 }
 
 .current {
-    border-bottom: 3px solid orange;
+    border-bottom: 3px solid purple !important;
+}
+
+th {
+    text-align: center;
+}
+
+.table-hover>tbody>tr>td:hover, .table-hover>tbody>tr>td:hover{
+    background: #000 !important;
+    color: #fff !important;
+    border-bottom: 3px solid red !important;
+}
+
+// reset the default bootstrap style on tr:hover
+.table-hover>tbody>tr:hover>td, .table-hover>tbody>tr:hover>th{
+    background-color: inherit;
 }

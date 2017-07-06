@@ -35,13 +35,14 @@ const Layout = ({children}) =>
 
         <link  />
 
-            <div className="main">
+            <div className="container">
 
                 {children}
 
+                <div className="footer">&copy; Example Calendar</div>
+
             </div>
 
-        <div className="footer">&copy; Example Calendar</div>
 
     </div>
 

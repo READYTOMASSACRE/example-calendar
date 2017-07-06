@@ -6,22 +6,29 @@ import Day from './Day'
  * @desc Линии бронирования на календаре
  */
 export default class DrawLine {
-    constructor(opts) {
-        opts = opts || {}
-        if (opts.startedAt && !(opts.startedAt instanceof Day)) {
-            opts.startedAt = new Day(opts.startedAt)
+    constructor(props) {
+        let opts = {}
+        if (props && typeof props.startedAt !== 'undefined') {
+            opts.startedAt = new Day(props.startedAt)
         }
-        if (opts.finishedAt && !(opts.finishedAt instanceof Day)) {
-            opts.finishedAt = new Day(opts.finishedAt)
+        if (props && typeof props.finishedAt !== 'undefined') {
+            opts.finishedAt = new Day(props.finishedAt)
+        }
+        if (props && typeof props.description !== 'undefined') {
+            opts.description = props.description
         }
         this.startedAt = opts.startedAt || null
         this.finishedAt = opts.finishedAt || null
-        this.text = opts.description || "DrawLines Instance"
-        this.status = this.startedAt instanceof Day
-            ? this.finishedAt instanceof Day
-                ? DrawLine.STATUS_FINISH
-                : DrawLine.STATUS_BEGIN
-            : DrawLine.STATUS_NULL
+        this.description = opts.description || "DrawLine Instance"
+        if (typeof opts.status !== 'undefined') {
+            this.status = opts.status
+        } else {
+            this.status = this.startedAt instanceof Day
+                ? this.finishedAt instanceof Day
+                    ? DrawLine.STATUS_COMPLETED
+                    : DrawLine.STATUS_INIT
+                : DrawLine.STATUS_NULL
+        }
     }
 
     /**
@@ -31,8 +38,8 @@ export default class DrawLine {
      *
      * @return {String}
      */
-    static get STATUS_BEGIN() {
-        return 'begin'
+    static get STATUS_INIT() {
+        return 'init'
     }
 
     /**
@@ -42,8 +49,8 @@ export default class DrawLine {
      *
      * @return {String}
      */
-    static get STATUS_FINISH() {
-        return 'finish'
+    static get STATUS_COMPLETED() {
+        return 'completed'
     }
 
     /**
@@ -55,6 +62,17 @@ export default class DrawLine {
      */
     static get STATUS_NULL() {
         return 'null'
+    }
+
+    /**
+     * Геттер
+     *
+     * @var STATUS_PUSHED - статус
+     *
+     * @return {String}
+     */
+    static get STATUS_PUSHED() {
+        return 'pushed'
     }
 
     /**
@@ -71,24 +89,24 @@ export default class DrawLine {
         }
 
         switch (this.status) {
-            case DrawLine.STATUS_FINISH:
+            case DrawLine.STATUS_COMPLETED:
                 this.startedAt = null
                 this.finishedAt = null
                 this.status = DrawLine.STATUS_NULL
                 break
-            case DrawLine.STATUS_BEGIN:
+            case DrawLine.STATUS_INIT:
                 if (value.get() > this.startedAt.get()) {
-                    this.finishedAt = value
-                    this.status = DrawLine.STATUS_FINISH
+                    this.finishedAt = value.copy()
+                    this.status = DrawLine.STATUS_COMPLETED
                 } else {
                     this.finishedAt = this.startedAt.copy()
                     this.startedAt = value
-                    this.status = DrawLine.STATUS_FINISH
+                    this.status = DrawLine.STATUS_COMPLETED
                 }
                 break
             default:
                 this.startedAt = value
-                this.status = DrawLine.STATUS_BEGIN
+                this.status = DrawLine.STATUS_INIT
                 break
         }
 
@@ -98,13 +116,51 @@ export default class DrawLine {
     /**
      * Проверяет на вхождение в отрезок выбранного элемента
      *
-     * @var {Day} value - день
+     * @var {Date} value - дата
      *
      * @return {Boolean}
      */
-    isEmptyFor(item) {
-        return this.status !== DrawLine.STATUS_FINISH
-            || item.get() < this.startedAt.get()
-            || item.get() > this.finishedAt.get()
+    isDateInRange(date) {
+        return (
+            this.startedAt instanceof Day
+            && this.startedAt.valueOf() === date.valueOf()
+        ) || (
+            this.startedAt instanceof Day
+            && this.finishedAt instanceof Day
+            && date >= this.startedAt.get()
+            && this.finishedAt.get() >= date
+        )
     }
+
+    /**
+     * Проверяет пересечение отрезков
+     *
+     * @var {DrawLine} item
+     *
+     * @return {Boolean}
+     */
+    isIntersectWith(item) {
+        return (
+            item.startedAt.get() >= this.startedAt.get()
+            && this.finishedAt.get() >= item.finishedAt.get()
+        ) || (
+            item.startedAt.get() >= this.startedAt.get()
+            && this.finishedAt.get() >= item.startedAt.get()
+            && item.finishedAt.get() >= this.finishedAt.get()
+        ) || (
+            this.startedAt.get() >= item.startedAt.get()
+            && item.finishedAt.get() >= this.startedAt.get()
+            && this.finishedAt.get() >= item.finishedAt.get()
+        )
+    }
+
+    /**
+     * Копирует объект
+     *
+     * @return {DrawLine}
+     */
+    copy() {
+        return Object.assign(new DrawLine(), this)
+    }
+
 }

@@ -31,7 +31,7 @@ class CalendarBody extends Component {
                 <DayNames />
                 {this.listItems}
             </tbody>
-        );
+        )
     }
 }
 

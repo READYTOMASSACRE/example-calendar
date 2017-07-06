@@ -113,19 +113,21 @@ export default class Calendar {
      */
     setCurrent(type) {
         if (this.type === type) return this
-        if (['day', 'week', 'month'].indefOx(type) === -1) {
+
+        if (['day', 'week', 'month'].indexOf(type) === -1) {
             throw new Error('Invalid type')
         }
 
         this.type = type
         if (type === 'day') {
-            this.change(this.current.copy().get().pop())
+            let day = this.current.get().find(item => item.currentMonth === this.current.currentMonth)
+            this.change(day.copy())
         } else {
             let day = this.current.copy()
             if (!(day instanceof Day)) {
                 day = day.pop()
             }
-            this.change(type === 'week' && new Week(day) || new Month(day))
+            this.change((type === 'week' && new Week(day)) || new Month(day))
         }
 
         return this

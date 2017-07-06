@@ -180,7 +180,10 @@ export default class Day {
      * @return {Day}
      */
     copy() {
-        return Object.assign(new Day(this.get()), this)
+        let object = Object.assign(new Day(this.get()), this)
+        object.d = Object.assign(new Date(this.d.toString()), this.d)
+
+        return object
     }
 
     /**

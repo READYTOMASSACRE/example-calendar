@@ -1,14 +1,16 @@
 import React from 'react';
 
 const DayNames = () =>
-    <tr className="week names">
-        <td className="day">Mon</td>
-        <td className="day">Tue</td>
-        <td className="day">Wed</td>
-        <td className="day">Thu</td>
-        <td className="day">Fri</td>
-        <td className="day">Sat</td>
-        <td className="day">Sun</td>
-    </tr>
+    <thead className="week names">
+        <tr key="1">
+            <th>Пн</th>
+            <th>Вт</th>
+            <th>Ср</th>
+            <th>Чт</th>
+            <th>Пт</th>
+            <th>Сб</th>
+            <th>Вс</th>
+        </tr>
+    </thead>
 
 export default DayNames
