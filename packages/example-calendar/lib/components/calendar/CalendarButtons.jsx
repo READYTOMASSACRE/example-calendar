@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
+import { withApollo, compose } from 'react-apollo';
+import { Components, withNew, withDocument, getFragment } from 'meteor/vulcan:core'
+import CalendarCollection from '../../modules/calendar/collection'
 
-export default class CalendarButtons extends Component {
+class CalendarButtons extends Component {
     constructor(props) {
         super(props)
         this.handleShowClick = this.handleShowClick.bind(this)
@@ -9,22 +12,56 @@ export default class CalendarButtons extends Component {
         this.handleChange = this.handleChange.bind(this)
     }
 
+    /**
+     * Обработчик на клик - показать информацию о бронировании
+     *
+     * @param {Event} e
+     *
+     * @return {null}
+     */
     handleShowClick(e) {
         return this.props.showClick(e)
     }
 
+    /**
+     * Обработчик на клик - удалить бронирование
+     *
+     * @param {Event} e
+     *
+     * @return {null}
+     */
     handleDeleteClick(e) {
         return this.props.deleteClick(e)
     }
 
+    /**
+     * Обработчик на клик - добавить бронирование
+     *
+     * @param {Event} e
+     *
+     * @return {null}
+     */
     handleAddClick(e) {
-        return this.props.addClick(e)
+        return this.props.addClick(e, {
+            document: this.props.document
+            , newMutation: this.props.newMutation
+        })
     }
 
+    /**
+     * Событие, при изменении описания бронирования
+     *
+     * @param {Event} e
+     *
+     * @return {null}
+     */
     handleChange(e) {
         return this.props.onTextChange(e)
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         let editableButtons = null
             , showableButtons = null
@@ -55,3 +92,15 @@ export default class CalendarButtons extends Component {
         )
     }
 }
+
+const options = {
+    collection: CalendarCollection
+    , fragment: getFragment('CalendarItemFragment')
+}
+const queryOptions = {
+    collection: CalendarCollection
+    , fragment: getFragment('CalendarItemFragment')
+}
+
+/** оборачиваем функцией обреткой для добавления newMutation */
+export default compose(withNew(options), withDocument(queryOptions))(CalendarButtons)

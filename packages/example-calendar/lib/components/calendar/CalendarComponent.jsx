@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Calendar, { Day, DrawLine } from '../../utils/calendar'
-import { Components, withList, withCurrentUser, Loading, getFragment } from 'meteor/vulcan:core'
+import { Components, withList, withNew, withCurrentUser, Loading, getFragment } from 'meteor/vulcan:core'
 import CalendarCollection from '../../modules/calendar/collection'
 // import Calendar, { Day, DrawLine } from '../utils/calendar' //client
 import CalendarHeader from './CalendarHeader'
@@ -68,6 +68,9 @@ class CalendarComponent extends Component {
         })
     }
 
+    /**
+     * обрабатывает клик переключения вида
+     */
     handleToggleView(e, view) {
         this.state.calendar.setCurrent(view)
         this.setState((prevState, props) => {
@@ -182,7 +185,7 @@ class CalendarComponent extends Component {
      *
      * @param {Event} e
      */
-    drawLineAdd(e) {
+    drawLineAdd(e, {document, newMutation}) {
         let result = {
             startedAt: this.state.currentDrawLine.startedAt.get().toString()
             , finishedAt: (
@@ -193,10 +196,21 @@ class CalendarComponent extends Component {
             , description: this.state.currentDrawLine.description
         }
 
-        if (ENVIROMENT === SERVER) {
-            console.log(CalendarCollection, getFragment('CalendarItemFragment'))
-        } else {
-            console.log(result)
+        if (result) {
+            newMutation({ document: result }).then(_res => {
+                let res = _res.data.calendarNewItem
+                    , drawLine = new DrawLine(res)
+                    , lines = this.state.lines
+                lines.push(drawLine)
+                this.setState((prevState, props) => {
+                    return {
+                        lines: lines
+                        , currentDrawLine: drawLine
+                        , editableButtons: false
+                        , showableButtons: true
+                    }
+                })
+            })
         }
     }
 
@@ -325,17 +339,6 @@ class CalendarComponent extends Component {
                         ? <CalendarModal currentDrawLine={this.state.currentDrawLine} />
                         : null
                 }
-                {
-                    /* Render form Add Draw Line */
-                    ENVIROMENT === SERVER ?
-                        CalendarCollection.options.mutations.new.check(this.props.currentUser)
-                        ? <Components.SmartForm
-                            collection={CalendarCollection}
-                            mutationFragment={getFragment('CalendarItemFragment')}
-                        />
-                        : null
-                    : null
-                }
             </div>
         );
     }
@@ -344,8 +347,7 @@ class CalendarComponent extends Component {
 const options = {
     collection: CalendarCollection
         , fragmentName: 'CalendarItemFragment'
-        , limit: 5
+        , limit: 50
 }
 
 export default withList(options)(withCurrentUser(CalendarComponent));
-// export default CalendarComponent

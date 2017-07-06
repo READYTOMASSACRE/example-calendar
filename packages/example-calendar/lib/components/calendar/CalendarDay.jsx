@@ -3,15 +3,32 @@ import { Month, DrawLine, Day } from '../../utils/calendar' // server
 // import { Month, DrawLine, Day } from '../utils/calendar' // client
 
 class CalendarDay extends Component {
+    /**
+     * @inheritdoc
+     */
     constructor(props) {
         super(props)
         this.selectItem = this.selectItem.bind(this)
     }
 
+    /**
+     * Обработчик, клик по текущему элементу
+     *
+     * @param {Event} e
+     * @param {Day} day
+     * @param {Integer} hour
+     *
+     * @return {null}
+     */
     selectItem(e, day, hour) {
         return this.props.select(e, day, hour)
     }
 
+    /**
+     * Геттер
+     *
+     * @return {Array}
+     */
     get dayItems() {
         let _items = this.setActivity()
             , items = []
@@ -85,6 +102,9 @@ class CalendarDay extends Component {
         return items
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         return (
             <table className="table table-hover">

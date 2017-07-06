@@ -3,20 +3,44 @@ import { Day } from '../../utils/calendar' // server
 // import { Day } from '../utils/calendar' // client
 
 class CalendarHeader extends Component {
+    /**
+     * @inheritdoc
+     */
     constructor(props) {
         super(props)
         this.handleClick = this.handleClick.bind(this)
         this.handleToggleView = this.handleToggleView.bind(this)
     }
 
+    /**
+     * Обработчик, переключение календаря
+     *
+     * @param {Event} e
+     * @param {String} direction
+     *
+     * @return {null}
+     */
     handleClick(e, direction) {
         this.props.toggle(e, direction)
     }
 
+    /**
+     * Обработчик, переключение вида
+     *
+     * @param {Event} e
+     * @param {String} view
+     *
+     * @return {null}
+     */
     handleToggleView(e, view) {
         this.props.toggleView(e, view)
     }
 
+    /**
+     * Геттер
+     *
+     * @return {Array}
+     */
     get month() {
         return [
             'Январь',
@@ -34,6 +58,9 @@ class CalendarHeader extends Component {
         ]
     }
 
+    /**
+     * @inheritdoc
+     */
     render() {
         let title = this.props.calendarItem instanceof Day ? this.props.calendarItem.currentDay + ' ' : ''
         title += this.month[this.props.calendarItem.currentMonth] + ', ' + this.props.calendarItem.currentYear

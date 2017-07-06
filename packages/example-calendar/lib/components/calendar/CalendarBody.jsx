@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
 import DayNames from './DayNames'
 
+/**
+ * @inheritdoc
+ */
 class CalendarBody extends Component {
+    /**
+     * Геттер
+     *
+     * @return {Array}
+     */
     get listItems() {
         let _items = this.props.items.map((item,) =>
             <td
@@ -25,6 +33,10 @@ class CalendarBody extends Component {
 
         return items
     }
+
+    /**
+     * @inheritdoc
+     */
     render() {
         return (
             <tbody>

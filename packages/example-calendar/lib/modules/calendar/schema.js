@@ -41,7 +41,7 @@ const schema = {
         type: Date,
         optional: true,
         viewableBy: ['guests'],
-        insertableBy: ['members'],
+        insertableBy: ['guests'],
         editableBy: ['members'],
     },
     title: {
@@ -49,7 +49,7 @@ const schema = {
         type: String,
         optional: true,
         viewableBy: ['guests'],
-        insertableBy: ['members'],
+        insertableBy: ['guests'],
         editableBy: ['members']
     },
     description: {
@@ -58,7 +58,7 @@ const schema = {
         optional: true,
         control: 'textarea',
         viewableBy: ['guests'],
-        insertableBy: ['members'],
+        insertableBy: ['guests'],
         editableBy: ['members']
     },
     options: {
